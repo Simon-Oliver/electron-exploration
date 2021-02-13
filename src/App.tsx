@@ -22,6 +22,18 @@ const Hello = () => {
   const [state, setState] = useState({ data: 'test' });
   const [closed, setClosed] = useState(true);
 
+  const intervalId = useRef();
+
+  useEffect(() => {
+    intervalId.current = setInterval(() => {
+      if (closed) {
+        console.log('RECONNECTING TO ARDUINO');
+        connect();
+      }
+    }, 1000);
+    return () => clearInterval(intervalId.current);
+  }, [closed]);
+
   const connect = async () => {
     const list = await serialPort.list();
 
@@ -40,69 +52,14 @@ const Hello = () => {
         });
 
         sp.on('close', () => {
+          sp.close(() => console.log('Closed'));
           setClosed(true);
-          console.log('Closed');
         });
 
         console.log(e.path);
       }
     });
   };
-
-  function useInterval(callback, delay) {
-    const savedCallback = useRef();
-
-    // Remember the latest callback.
-    useEffect(() => {
-      savedCallback.current = callback;
-    }, [callback]);
-
-    // Set up the interval.
-    useEffect(() => {
-      function tick() {
-        savedCallback.current();
-      }
-      if (delay !== null) {
-        let id = setInterval(tick, delay);
-        return () => clearInterval(id);
-      }
-    }, [delay]);
-  }
-
-  if (closed) {
-    useInterval(function () {
-      console.log('RECONNECTING TO ARDUINO');
-      connect();
-    }, 1000);
-  }
-
-  useEffect(() => {
-    // //called automatically by bindings.list()
-    // function list(ports) {
-    //   listOfPorts = ports;
-    //   // now listOfPorts will be the port Objects
-    //   listOfPorts.forEach((e) => {
-    //     if (e.manufacturer === 'SparkFun') {
-    //       console.log(e.path);
-    //       var sp = new serialPort(e.path, {
-    //         baudRate: 9600,
-    //       });
-    //       //parse incoming data line-by-line from serial port.
-    //       const parser = sp.pipe(new Readline({ delimiter: '\r\n' }));
-    //       parser.on('open', () => console.log('====== Open ======'));
-    //       parser.on('data', function (data) {
-    //         console.log('Data:', data);
-    //       });
-    //       parser.on('close', function () {
-    //         console.log('---- Disconnected ------');
-    //       });
-    //     }
-    //   });
-    // }
-    // bindings.list().then(list, (err) => {
-    //   process.exit(1);
-    // });
-  }, [closed]);
 
   const changeHandler = (e) => {
     e.preventDefault();
