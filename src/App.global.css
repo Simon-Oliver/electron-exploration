@@ -19,6 +19,10 @@ body {
   align-items: center;
 }
 
+span {
+  margin-left: 10px;
+}
+
 button {
   background-color: white;
   padding: 10px 20px;
