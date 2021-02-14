@@ -17,7 +17,7 @@ import './App.global.css';
 const Readline = serialPort.parsers.Readline;
 
 const Hello = () => {
-  const [state, setState] = useState({ data: 'test' });
+  const [state, setState] = useState({ data: 0 });
   const [searching, setSearching] = useState(true);
   const [devices, setDevices] = useState([]);
   const [openPorts, setOpenPorts] = useState([]);
@@ -85,59 +85,83 @@ const Hello = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-
-    let filename = dialog
-      .showSaveDialog({})
-      .then((result) => {
-        filename = result.filePath + '.txt';
-        if (filename === undefined) {
-          alert("the user clicked the btn but didn't created a file");
-          return;
+    openPorts.filter((port) => port.port.path === e.target.dataset.path);
+    console.log(openPorts);
+    console.log("'''''''''''''''''''''", e.target.dataset.path);
+    console.log(
+      openPorts.filter((port) => port.port.path === e.target.dataset.path)[0]
+    );
+    openPorts
+      .filter((port) => port.port.path === e.target.dataset.path)[0]
+      .port.write(state.data, function (err) {
+        if (err) {
+          console.log('err: ' + err);
         }
-        fs.writeFile(filename, 'test 123', (err) => {
-          if (err) {
-            alert('an error ocurred with file creation ' + err.message);
-            return;
-          }
-          alert('WE CREATED YOUR FILE SUCCESFULLY');
-        });
-        alert('we End');
-      })
-      .catch((err) => {
-        alert(err);
       });
+    // let filename = dialog
+    //   .showSaveDialog({})
+    //   .then((result) => {
+    //     filename = result.filePath + '.txt';
+    //     if (filename === undefined) {
+    //       alert("the user clicked the btn but didn't created a file");
+    //       return;
+    //     }
+    //     fs.writeFile(filename, 'test 123', (err) => {
+    //       if (err) {
+    //         alert('an error ocurred with file creation ' + err.message);
+    //         return;
+    //       }
+    //       alert('WE CREATED YOUR FILE SUCCESFULLY');
+    //     });
+    //     alert('we End');
+    //   })
+    //   .catch((err) => {
+    //     alert(err);
+    //   });
   };
 
   const renderList = (el) => {
     const paths = openPorts.map((e) => e.port.path);
 
-    return el.map((e, i) => (
-      <div
-        onClick={(e) => onClickHandler(e)}
-        data-index={i}
-        data-path={e.path}
-        key={e.path}
-      >
-        {e.manufacturer}
-        <span onClick={(e) => e.stopPropagation()}>
-          {paths.indexOf(e.path) !== -1 ? 'Connected' : 'Not Connected'}
-        </span>
+    return el.map((port, i) => (
+      <div>
+        <div
+          onClick={(e) => onClickHandler(e)}
+          data-index={i}
+          data-path={port.path}
+          key={port.path}
+        >
+          {port.manufacturer}
+          <span onClick={(e) => e.stopPropagation()}>
+            {paths.indexOf(port.path) !== -1 ? 'Connected' : 'Not Connected'}
+          </span>
+        </div>
+        {paths.indexOf(port.path) !== -1 ? (
+          <form
+            data-path={port.path}
+            onChange={(e) => changeHandler(e)}
+            onSubmit={(e) => submitHandler(e)}
+          >
+            <label>
+              Your data:
+              <input
+                onClick={(e) => e.stopPropagation()}
+                data-path={port.path}
+                type="text"
+                name="name"
+              />
+            </label>
+            <input type="submit" value="Submit" />
+          </form>
+        ) : (
+          ''
+        )}
       </div>
     ));
   };
 
   return (
     <div>
-      <form
-        onChange={(e) => changeHandler(e)}
-        onSubmit={(e) => submitHandler(e)}
-      >
-        <label>
-          Your data:
-          <input type="text" name="name" />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
       <div>{state.data}</div>
       <div>{renderList(devices)}</div>
     </div>
