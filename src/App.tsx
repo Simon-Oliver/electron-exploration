@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import icon from '../assets/icon.svg';
 import moment from 'moment';
 import fs from 'fs';
+import styles from './styleApp.module.css';
 
 const { remote } = require('electron');
 const serialPort = remote.require('serialport');
@@ -98,6 +99,8 @@ const Hello = () => {
           console.log('err: ' + err);
         }
       });
+
+    setState({ data: 0 });
     // let filename = dialog
     //   .showSaveDialog({})
     //   .then((result) => {
@@ -124,12 +127,11 @@ const Hello = () => {
     const paths = openPorts.map((e) => e.port.path);
 
     return el.map((port, i) => (
-      <div>
+      <div key={port.path} className={styles.devices}>
         <div
           onClick={(e) => onClickHandler(e)}
           data-index={i}
           data-path={port.path}
-          key={port.path}
         >
           {port.manufacturer}
           <span onClick={(e) => e.stopPropagation()}>
@@ -149,6 +151,7 @@ const Hello = () => {
                 data-path={port.path}
                 type="text"
                 name="name"
+                value={state.data}
               />
             </label>
             <input type="submit" value="Submit" />
