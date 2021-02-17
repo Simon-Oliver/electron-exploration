@@ -165,6 +165,20 @@ const Hello = () => {
 
   return (
     <div>
+      <div className={styles.deviceContainer}>
+        <div className={styles.item}>
+          <div>USB Devices 1</div>
+          <div>Connected</div>
+        </div>
+        <div className={styles.item}>
+          <div>USB Devices 2</div>
+          <div>Connected</div>
+        </div>
+        <div className={styles.item}>
+          <div>USB Devices 3</div>
+          <div>Connected</div>
+        </div>
+      </div>
       <div>{state.data}</div>
       <div>{renderList(devices)}</div>
     </div>

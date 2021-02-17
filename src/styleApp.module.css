@@ -3,4 +3,23 @@
   background-color: white;
   width: 300px;
   padding: 20px;
+  border-radius: 8px;
+}
+
+.item {
+  color: black;
+  background-color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-radius: 8px;
+}
+
+.deviceContainer {
+  width: 70vw;
+  display: grid;
+  gap: 0.5rem;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fit, minmax(min-content, 1fr));
 }
