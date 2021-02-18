@@ -123,11 +123,26 @@ const Hello = () => {
     //   });
   };
 
+  useEffect(() => {
+    console.log(openPorts);
+  }, [openPorts]);
+
+  const reset = () => {
+    // console.log('Before: ', openPorts);
+    // openPorts.forEach((e) => {
+    //   e.port.close();
+    // });
+    // setOpenPorts([]);
+    // setDevices([]);
+    // app.relaunch();
+    app.exit(0);
+  };
+
   const renderList = (el) => {
     const paths = openPorts.map((e) => e.port.path);
 
     return el.map((port, i) => (
-      <div key={port.path} className={styles.devices}>
+      <div key={port.path} className={styles.item}>
         <div
           onClick={(e) => onClickHandler(e)}
           data-index={i}
@@ -181,6 +196,7 @@ const Hello = () => {
       </div>
       <div>{state.data}</div>
       <div>{renderList(devices)}</div>
+      <button onClick={() => reset()}>Reset</button>
     </div>
   );
 };
