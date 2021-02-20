@@ -6,6 +6,17 @@
   border-radius: 8px;
 }
 
+.page {
+  background-color: grey;
+  color: red;
+}
+
+@media print {
+  .page {
+    background-color: grey;
+  }
+}
+
 .item {
   color: black;
   background-color: white;

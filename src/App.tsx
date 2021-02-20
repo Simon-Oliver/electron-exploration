@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import icon from '../assets/icon.svg';
 import moment from 'moment';
 import fs from 'fs';
 import styles from './styleApp.module.css';
+const path = require('path');
+import Template from './template';
+import { createInvoice } from './utils/createInvoice';
+const pdf = require('html-pdf');
 
 const { remote } = require('electron');
 const serialPort = remote.require('serialport');
+const BrowserWindow = remote.BrowserWindow;
 // const list = remote.require('@serialport/list');
 //const bindings = remote.require('@serialport/bindings');
 
@@ -16,6 +22,14 @@ const dialog = remote.dialog;
 import './App.global.css';
 
 const Readline = serialPort.parsers.Readline;
+
+//-------------- Test Data -----------------
+const invoice = {
+  name: 'John Doe',
+  invoiceNumber: 1234,
+};
+
+//-------------- Test Data -----------------
 
 const Hello = () => {
   const [state, setState] = useState({ data: 0 });
@@ -127,7 +141,7 @@ const Hello = () => {
     console.log(openPorts);
   }, [openPorts]);
 
-  const reset = () => {
+  const print = () => {
     // console.log('Before: ', openPorts);
     // openPorts.forEach((e) => {
     //   e.port.close();
@@ -135,7 +149,84 @@ const Hello = () => {
     // setOpenPorts([]);
     // setDevices([]);
     // app.relaunch();
-    app.exit(0);
+    // let win = BrowserWindow.getFocusedWindow();
+    // let win = BrowserWindow.getAllWindows()[0];
+
+    let win = new BrowserWindow({
+      show: false,
+      webPreferences: {
+        // You need this options to load pdfs
+        plugins: true, // this will enable you to use pdfs as source and not just download it.
+      },
+    });
+
+    var options = {
+      marginsType: 0,
+      pageSize: 'A4',
+      printBackground: true,
+      printSelectionOnly: false,
+      landscape: false,
+    };
+
+    // createInvoice(invoice, __dirname + '/pdfs/testNEW.pdf');
+    // var options = { format: 'Letter' };
+    // pdf
+    //   .create(template, options)
+    //   .toFile('./pdfs/testNEW.pdf', function (err, res) {
+    //     if (err) return console.log(err);
+    //     console.log(res); // { filename: '/app/businesscard.pdf' }
+    //   });
+
+    const filePath = __dirname + '/pdfs/testNEW.pdf';
+    //win.loadURL('file://' + filePath);
+    // win.webContents.on('did-frame-finish-load', () => {
+    //   win.webContents.print({ printBackground: true });
+    // });
+    //win.webContents.print();
+    // win.webContents.print((success, failureReason) => {
+    //   if (!success) console.log(failureReason);
+
+    //   console.log('Print Initiated');
+    // });
+
+    let html = createInvoice(invoice);
+    win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+    win.webContents.on('did-frame-finish-load', () => {
+      // win.webContents.print({ printBackground: true });
+      win.webContents
+        .printToPDF(options)
+        .then((data) => {
+          fs.writeFile(filePath, data, function (err) {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log('PDF Generated Successfully');
+              let winPDF = new BrowserWindow({
+                webPreferences: {
+                  // You need this options to load pdfs
+                  plugins: true, // this will enable you to use pdfs as source and not just download it.
+                },
+              });
+              winPDF.loadURL(`file://${filePath}`);
+            }
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+
+    //win.loadURL(`file://${filePath}`);
+    // win.webContents.on('did-frame-finish-load', () => {
+    //   win.webContents.print({ printBackground: true });
+    // });
+
+    console.log(createInvoice(invoice));
+    // win.webContents.print((success, failureReason) => {
+    //   if (!success) console.log(failureReason);
+
+    //   console.log('Print Initiated');
+    // });
   };
 
   const renderList = (el) => {
@@ -196,7 +287,7 @@ const Hello = () => {
       </div>
       <div>{state.data}</div>
       <div>{renderList(devices)}</div>
-      <button onClick={() => reset()}>Reset</button>
+      <button onClick={() => print()}>Reset</button>
     </div>
   );
 };
