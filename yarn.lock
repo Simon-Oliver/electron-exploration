@@ -8766,7 +8766,7 @@
   "resolved" "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz"
   "version" "0.10.0"
 
-"node-gyp@^7.1.0":
+"node-gyp@^7.1.0", "node-gyp@^7.1.2":
   "integrity" "sha512-CbpcIo7C3eMu3dL1c3d0xw449fHIGALIJsRP4DDPHpyiW8vcriNY7ubh9TE4zEKfSxscY7PjeFnshE7h75ynjQ=="
   "resolved" "https://registry.yarnpkg.com/node-gyp/-/node-gyp-7.1.2.tgz"
   "version" "7.1.2"

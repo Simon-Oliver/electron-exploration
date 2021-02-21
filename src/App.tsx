@@ -229,6 +229,32 @@ const Hello = () => {
     // });
   };
 
+  const ble = () => {
+    console.log(
+      `>>>> navigator.bluetooth.requestDevice: ${navigator.bluetooth.requestDevice}`
+    );
+    try {
+      const filters = [];
+      filters.push({ namePrefix: 'MOB' });
+      console.log(`Using filters: ${JSON.stringify(filters)}`);
+      navigator.bluetooth
+        .requestDevice({ acceptAllDevices: true })
+        .then((device) => {
+          console.log('> Name:             ' + device);
+          // console.log('> Id:               ' + device.id);
+          // console.log(
+          //   '> UUIDs:            ' + device.uuids.join('\n' + ' '.repeat(20))
+          // );
+          //console.log('> Connected:        ' + device.gatt.connected);
+        })
+        .catch((error) => {
+          console.error('Argh! ' + error);
+        });
+    } catch (e) {
+      console.log('EXCEPTION> ' + e);
+    }
+  };
+
   const renderList = (el) => {
     const paths = openPorts.map((e) => e.port.path);
 
@@ -271,23 +297,10 @@ const Hello = () => {
 
   return (
     <div>
-      <div className={styles.deviceContainer}>
-        <div className={styles.item}>
-          <div>USB Devices 1</div>
-          <div>Connected</div>
-        </div>
-        <div className={styles.item}>
-          <div>USB Devices 2</div>
-          <div>Connected</div>
-        </div>
-        <div className={styles.item}>
-          <div>USB Devices 3</div>
-          <div>Connected</div>
-        </div>
-      </div>
       <div>{state.data}</div>
       <div>{renderList(devices)}</div>
-      <button onClick={() => print()}>Reset</button>
+      <button onClick={() => print()}>Print</button>
+      <button onClick={() => ble()}>Bluethooth</button>
     </div>
   );
 };

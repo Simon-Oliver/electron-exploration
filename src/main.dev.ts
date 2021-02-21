@@ -15,7 +15,6 @@ import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -107,6 +106,21 @@ const createWindow = async () => {
     shell.openExternal(url);
   });
 
+  // Not sure if this code is needed
+  // mainWindow.webContents.on(
+  //   'select-bluetooth-device',
+  //   (event, deviceList, callback) => {
+  //     event.preventDefault();
+  //     console.log('Device list:', deviceList);
+  //     let result = deviceList[0];
+  //     if (!result) {
+  //       callback('');
+  //     } else {
+  //       callback(result.deviceId);
+  //     }
+  //   }
+  // );
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -115,6 +129,8 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
+
+app.commandLine.appendSwitch('enable-web-bluetooth', true);
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even

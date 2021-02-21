@@ -5,7 +5,8 @@ export default function Template() {
   return (
     <div style={{
       color:"red",
-      backgroundColor:"grey"
+      backgroundColor:"grey",
+      print
     }}>
       <h1>Test</h1>
       <p>This is a test for printing my template.</p>
