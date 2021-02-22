@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server';
+import { v4 as uuidv4 } from 'uuid';
 import icon from '../assets/icon.svg';
 import moment from 'moment';
 import fs from 'fs';
@@ -24,10 +25,20 @@ import './App.global.css';
 const Readline = serialPort.parsers.Readline;
 
 //-------------- Test Data -----------------
-const invoice = {
-  name: 'John Doe',
-  invoiceNumber: 1234,
-};
+const invoice = [
+  {
+    name: 'John Doe',
+    invoiceNumber: 1234,
+  },
+  {
+    name: 'Max Muster',
+    invoiceNumber: 888888,
+  },
+  {
+    name: 'Thomas Tester',
+    invoiceNumber: 999999,
+  },
+];
 
 //-------------- Test Data -----------------
 
@@ -176,8 +187,8 @@ const Hello = () => {
     //     if (err) return console.log(err);
     //     console.log(res); // { filename: '/app/businesscard.pdf' }
     //   });
-
-    const filePath = __dirname + '/pdfs/testNEW.pdf';
+    const fileID = uuidv4();
+    const filePath = __dirname + `/pdfs/${fileID}.pdf`;
     //win.loadURL('file://' + filePath);
     // win.webContents.on('did-frame-finish-load', () => {
     //   win.webContents.print({ printBackground: true });
@@ -189,7 +200,12 @@ const Hello = () => {
     //   console.log('Print Initiated');
     // });
 
-    let html = createInvoice(invoice);
+    let html = '';
+
+    invoice.forEach((e) => {
+      html += createInvoice(e);
+    });
+
     win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
     win.webContents.on('did-frame-finish-load', () => {
       // win.webContents.print({ printBackground: true });
