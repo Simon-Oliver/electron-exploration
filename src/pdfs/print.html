@@ -8,11 +8,6 @@
         page-break-before: always;
       }
 
-      @page {
-        size: 21cm 29.7cm; /*A4*/
-        margin: 0cm !important;
-      }
-
       html {
         box-sizing: border-box;
         margin: 0;
@@ -33,36 +28,85 @@
       }
 
       .container {
-        padding: 1cm;
-        width: 21cm;
-        height: 100vh;
+        /* padding: 1cm; */
+        display: flex;
+        flex-direction: column;
+        width: 30vw;
+        height: 42.42vw;
         background: salmon;
       }
 
-      /* @page {
+      .item {
+        align-items: stretch;
+      }
+
+      .green {
+        display: flex;
+        align-items: flex-end;
+        background-color: green;
+        height: 8.8%;
+        padding-left: 5%;
+      }
+
+      .grey {
+        background-color: grey;
+        height: 24.4%;
+        padding: 5%;
+      }
+
+      .lavendar {
+        background-color: lavender;
+        flex-grow: 1;
+        padding: 5%;
+      }
+
+      @page {
+        size: 21cm 29.7cm; /*A4*/
         margin: 0cm !important;
-}
+      }
 
       @media print {
-
-
         .container {
-          width: 100vw;
-          height: 100vh;
-          background-color: green;
+          padding: 1cm;
+          width: 21cm;
+          height: 29.7cm;
+          background: salmon;
+          font-size: 10pt;
+        }
+        .title {
+          font-size: 28pt;
+          font-weight: 800;
+          text-transform: uppercase;
         }
       }
-        .container {
-          height: 290mm;
-          width: 210mm;
-          background-color: green;
-        } */
+
+      /* @page {
+              margin: 0cm !important;
+      }
+
+            @media print {
+
+
+              .container {
+                width: 100vw;
+                height: 100vh;
+                background-color: green;
+              }
+            }
+              .container {
+                height: 290mm;
+                width: 210mm;
+                background-color: green;
+              } */
     </style>
   </head>
   <body>
     <div class="container">
-      <div>Title</div>
-      <div>content</div>
+      <div class="item green">
+        <div class="title">Header</div>
+      </div>
+      <div class="item lavendar">content</div>
+      <div class="item grey">Title</div>
     </div>
   </body>
 </html>

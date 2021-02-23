@@ -12,11 +12,6 @@ return(`
         page-break-before: always;
       }
 
-      @page {
-        size: 21cm 29.7cm; /*A4*/
-        margin: 0cm !important;
-      }
-
       html {
         box-sizing: border-box;
         margin: 0;
@@ -37,39 +32,77 @@ return(`
       }
 
       .container {
-        padding: 1cm;
-        width: 21cm;
-        height: 100vh;
+        /* padding: 1cm; */
+        display: flex;
+        flex-direction: column;
+        width: 20rem;
+        height: 28.28rem;
         background: salmon;
       }
 
-      /* @page {
+      .item {
+        align-items: stretch;
+      }
+
+      .green {
+        background-color: green;
+        height: 10%;
+        padding: 5%;
+      }
+
+      .grey {
+        background-color: grey;
+      }
+
+      .lavendar {
+        background-color: lavender;
+        flex-grow: 1;
+        padding: 5%;
+      }
+
+      @page {
+        size: 21cm 29.7cm; /*A4*/
         margin: 0cm !important;
-}
+      }
 
       @media print {
-
-
         .container {
-          width: 100vw;
-          height: 100vh;
-          background-color: green;
+          /* padding: 1cm; */
+          width: 21cm;
+          height: 29.65cm;
+          background: salmon;
         }
       }
-        .container {
-          height: 290mm;
-          width: 210mm;
-          background-color: green;
-        } */
+
+      /* @page {
+              margin: 0cm !important;
+      }
+
+            @media print {
+
+
+              .container {
+                width: 100vw;
+                height: 100vh;
+                background-color: green;
+              }
+            }
+              .container {
+                height: 290mm;
+                width: 210mm;
+                background-color: green;
+              } */
     </style>
   </head>
   <body>
     <div class="container">
-      <div>${invoice.name}</div>
-      <div>content</div>
+      <div class="item green">Title</div>
+      <div class="item lavendar">${invoice.name}</div>
+      <div class="item green">Title</div>
     </div>
   </body>
 </html>
+
 `);
 }
 
