@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { renderToString, renderToStaticMarkup } from 'react-dom/server';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import icon from '../assets/icon.svg';
-import moment from 'moment';
 import fs from 'fs';
 import styles from './styleApp.module.css';
 const path = require('path');
-import Template from './template';
 import { createInvoice } from './utils/createInvoice';
 const pdf = require('html-pdf');
+import Settings from './components/Settings';
 
 const { remote } = require('electron');
 const serialPort = remote.require('serialport');
@@ -188,7 +185,7 @@ const Hello = () => {
     //     console.log(res); // { filename: '/app/businesscard.pdf' }
     //   });
     const fileID = uuidv4();
-    const filePath = __dirname + `/pdfs/${fileID}.pdf`;
+    const filePath = __dirname + `/pdfs/temp/${fileID}.pdf`;
     //win.loadURL('file://' + filePath);
     // win.webContents.on('did-frame-finish-load', () => {
     //   win.webContents.print({ printBackground: true });
@@ -223,7 +220,16 @@ const Hello = () => {
                   plugins: true, // this will enable you to use pdfs as source and not just download it.
                 },
               });
-              winPDF.loadURL(`file://${filePath}`);
+              winPDF.loadURL(`file://${filePath}`).then(() => {
+                fs.unlink(filePath, (err) => {
+                  if (err) {
+                    console.error(err);
+                    return;
+                  }
+
+                  //file removed
+                });
+              });
             }
           });
         })
@@ -317,6 +323,7 @@ const Hello = () => {
       <div>{renderList(devices)}</div>
       <button onClick={() => print()}>Print</button>
       <button onClick={() => ble()}>Bluethooth</button>
+      <Link to="/settings">Settings</Link>
     </div>
   );
 };
@@ -325,6 +332,7 @@ export default function App() {
   return (
     <Router>
       <Switch>
+        <Route path="/settings" component={Settings} />
         <Route path="/" component={Hello} />
       </Switch>
     </Router>
