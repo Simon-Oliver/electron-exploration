@@ -11,6 +11,35 @@
   color: red;
 }
 
+.gridContainer {
+  display: grid;
+  height: 100vh;
+  width: 100vw;
+  grid-template-columns: 60px auto;
+  background-color: red;
+}
+
+.navContainer {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  grid-column: 1 / 1;
+  background-color: green;
+}
+
+.navItem {
+  background-color: salmon;
+  height: 40px;
+  width: 40px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.mainContainer {
+  background-color: blue;
+  grid-column: auto;
+}
+
 @media print {
   .page {
     background-color: grey;

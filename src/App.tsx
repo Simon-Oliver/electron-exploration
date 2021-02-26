@@ -318,12 +318,22 @@ const Hello = () => {
   };
 
   return (
-    <div>
-      <div>{state.data}</div>
-      <div>{renderList(devices)}</div>
-      <button onClick={() => print()}>Print</button>
-      <button onClick={() => ble()}>Bluethooth</button>
-      <Link to="/settings">Settings</Link>
+    <div className={styles.gridContainer}>
+      <div className={styles.navContainer}>
+        <Link to="/settings">
+          <img className={styles.navItem} src={'./icons/bluetooth-24px.svg'} />
+        </Link>
+        <div className={styles.navItem}>tt</div>
+        <div className={styles.navItem}>tt</div>
+        <div className={styles.navItem}>tt</div>
+        <div className={styles.navItem}>tt</div>
+      </div>
+      <div className={styles.mainContainer}>
+        <div>{state.data}</div>
+        <div>{renderList(devices)}</div>
+        <button onClick={() => print()}>Print</button>
+        <button onClick={() => ble()}>Bluethooth</button>
+      </div>
     </div>
   );
 };
