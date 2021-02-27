@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  NavLink,
+} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import styles from './styleApp.module.css';
@@ -7,6 +13,7 @@ const path = require('path');
 import { createInvoice } from './utils/createInvoice';
 const pdf = require('html-pdf');
 import Settings from './components/Settings';
+import Nav from './components/Nav';
 
 const { remote } = require('electron');
 const serialPort = remote.require('serialport');
@@ -319,15 +326,7 @@ const Hello = () => {
 
   return (
     <div className={styles.gridContainer}>
-      <div className={styles.navContainer}>
-        <Link to="/settings">
-          <img className={styles.navItem} src={'./icons/bluetooth-24px.svg'} />
-        </Link>
-        <div className={styles.navItem}>tt</div>
-        <div className={styles.navItem}>tt</div>
-        <div className={styles.navItem}>tt</div>
-        <div className={styles.navItem}>tt</div>
-      </div>
+      <Nav></Nav>
       <div className={styles.mainContainer}>
         <div>{state.data}</div>
         <div>{renderList(devices)}</div>

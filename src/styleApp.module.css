@@ -24,19 +24,27 @@
   align-items: center;
   flex-direction: column;
   grid-column: 1 / 1;
-  background-color: green;
+  background-color: #212121;
+  padding-top: 15px;
 }
 
 .navItem {
-  background-color: salmon;
-  height: 40px;
-  width: 40px;
-  margin-top: 15px;
-  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  width: 30px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  fill: grey;
+}
+
+.active {
+  fill: white;
 }
 
 .mainContainer {
-  background-color: blue;
+  background-color: #121212;
   grid-column: auto;
 }
 
