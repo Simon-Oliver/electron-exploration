@@ -7,11 +7,7 @@ export default function Settings() {
   return (
     <div className={styles.gridContainer}>
       <Nav></Nav>
-    <div className={styles.mainContainer}>
-      <div>
-        test
-      </div>
-    </div>
+    <div className={styles.mainContainer}></div>
     </div>
   )
 }
