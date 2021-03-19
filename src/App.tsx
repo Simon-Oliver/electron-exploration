@@ -7,6 +7,7 @@ const path = require('path');
 import { createInvoice } from './utils/createInvoice';
 const pdf = require('html-pdf');
 import Settings from './components/Settings';
+import Inventory from './components/inventory';
 import Nav from './components/Nav';
 
 const { remote } = require('electron');
@@ -336,6 +337,7 @@ export default function App() {
     <Router>
       <Switch>
         <Route path="/settings" component={Settings} />
+        <Route path="/inventory" component={Inventory} />
         <Route path="/" component={Hello} />
       </Switch>
     </Router>
