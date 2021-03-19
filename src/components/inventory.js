@@ -3,18 +3,21 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Nav from "./Nav"
 import styles from '../styleApp.module.css';
 import fs from "fs"
+import path from "path"
 import invData from '../utils/inventoryStore.json'
 
 export default function Inventory() {
 
+  const dir = path.join(__dirname, '../src/utils/inventoryStore.json')
+
   const onClickHanlder = () => {
-    console.log("CLICK")
+    console.log("CLICK", invData)
 
     let inventory = invData
 
     inventory = [...inventory, {name:"Test 1"}]
 
-    fs.writeFile("../utils/inventoryStore.json", JSON.stringify(inventory), err=>{
+    fs.writeFile(dir, JSON.stringify(inventory), err=>{
       if(err){
         console.log(err)
       }
