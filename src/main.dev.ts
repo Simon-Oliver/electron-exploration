@@ -11,10 +11,13 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
+import { ipcMain, app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+
+app.commandLine.appendSwitch('enable-web-bluetooth', true);
+
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -71,10 +74,7 @@ const createWindow = async () => {
     width: 1024,
     height: 728,
     icon: getAssetPath('icon.png'),
-    webPreferences: {
-      nodeIntegration: true,
-      enableRemoteModule: true,
-    },
+    webPreferences: { nodeIntegration: true, enableRemoteModule: true },
   });
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
@@ -93,6 +93,70 @@ const createWindow = async () => {
     }
   });
 
+  // mainWindow.webContents.on(
+  //   'select-bluetooth-device',
+  //   (event, deviceList, callback) => {
+  //     event.preventDefault();
+  //     console.log('Console Loging from main', deviceList);
+  //     // callback('');
+  //     // const result = deviceList.find((device) => {
+  //     //   return device.deviceName === 'test';
+  //     // });
+  //     // if (!result) {
+  //     //   callback('');
+  //     // } else {
+  //     //   callback(result.deviceId);
+  //     // }
+  //   }
+  // );
+
+  ipcMain.handle('perform-action', (event, ...args) => {
+    console.log(args);
+  });
+
+  var callbackForBluetoothEvent = null;
+
+  //This sender sends the devicelist from the main process to all renderer processes
+  mainWindow.webContents.on(
+    'select-bluetooth-device',
+    (event, deviceList, callback) => {
+      event.preventDefault(); //important, otherwise first available device will be selected
+      //console.log(deviceList); //if you want to see the devices in the shell
+      let bluetoothDeviceList = deviceList;
+      callbackForBluetoothEvent = callback; //to make it accessible outside createWindow()
+
+      mainWindow.webContents.send(
+        'channelForBluetoothDeviceList',
+        bluetoothDeviceList
+      );
+    }
+  );
+
+  // This method will be called when Electron has finished
+  // initialization and is ready to create browser windows.
+  // Some APIs can only be used after this event occurs.
+  app.on('ready', createWindow);
+
+  //cancels Discovery
+  ipcMain.on('channelForTerminationSignal', (_) => {
+    callbackForBluetoothEvent(''); //reference to callback of win.webContents.on('select-bluetooth-device'...)
+    console.log('Discovery cancelled');
+  });
+
+  //resolves navigator.bluetooth.requestDevice() and stops device discovery
+  ipcMain.on('channelForSelectingDevice', (event, DeviceId) => {
+    callbackForBluetoothEvent(sentDeviceId); //reference to callback of win.webContents.on('select-bluetooth-device'...)
+    console.log('Device selected, discovery finished');
+  });
+
+  // mainWindow.webContents.on(
+  //   'select-bluetooth-device',
+  //   (event, deviceList, callback) => {
+  //     event.preventDefault();
+  //     console.log(deviceList);
+  //   }
+  // );
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -106,21 +170,6 @@ const createWindow = async () => {
     shell.openExternal(url);
   });
 
-  // Not sure if this code is needed
-  // mainWindow.webContents.on(
-  //   'select-bluetooth-device',
-  //   (event, deviceList, callback) => {
-  //     event.preventDefault();
-  //     console.log('Device list:', deviceList);
-  //     let result = deviceList[0];
-  //     if (!result) {
-  //       callback('');
-  //     } else {
-  //       callback(result.deviceId);
-  //     }
-  //   }
-  // );
-
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -129,8 +178,6 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
-
-app.commandLine.appendSwitch('enable-web-bluetooth', true);
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even

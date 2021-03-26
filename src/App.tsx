@@ -1,16 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
-import styles from './styleApp.module.css';
-const path = require('path');
-import { createInvoice } from './utils/createInvoice';
-const pdf = require('html-pdf');
-import Settings from './components/Settings';
-import Inventory from './components/inventory';
-import Nav from './components/Nav';
 
-const { remote } = require('electron');
+const { ipcRenderer, remote } = require('electron');
 const serialPort = remote.require('serialport');
 const BrowserWindow = remote.BrowserWindow;
 // const list = remote.require('@serialport/list');
@@ -22,24 +14,6 @@ const dialog = remote.dialog;
 import './App.global.css';
 
 const Readline = serialPort.parsers.Readline;
-
-//-------------- Test Data -----------------
-const invoice = [
-  {
-    name: 'John Doe',
-    invoiceNumber: 1234,
-  },
-  {
-    name: 'Max Muster',
-    invoiceNumber: 888888,
-  },
-  {
-    name: 'Thomas Tester',
-    invoiceNumber: 999999,
-  },
-];
-
-//-------------- Test Data -----------------
 
 const Hello = () => {
   const [state, setState] = useState({ data: 0 });
@@ -254,9 +228,13 @@ const Hello = () => {
   };
 
   const ble = () => {
-    console.log(
-      `>>>> navigator.bluetooth.requestDevice: ${navigator.bluetooth.requestDevice}`
-    );
+    ipcRenderer.invoke('perform-action', { test: 'test ble' });
+
+    ipcRenderer.on('channelForBluetoothDeviceList', (event, list) => {
+      let newList = list.filter((e) => !e.deviceName.includes('Unknown'));
+      console.log(newList);
+    });
+
     try {
       const filters = [];
       filters.push({ namePrefix: 'MOB' });
@@ -264,7 +242,7 @@ const Hello = () => {
       navigator.bluetooth
         .requestDevice({ acceptAllDevices: true })
         .then((device) => {
-          console.log('> Name:             ' + device);
+          console.log('> Name:', device);
           // console.log('> Id:               ' + device.id);
           // console.log(
           //   '> UUIDs:            ' + device.uuids.join('\n' + ' '.repeat(20))
@@ -283,7 +261,7 @@ const Hello = () => {
     const paths = openPorts.map((e) => e.port.path);
 
     return el.map((port, i) => (
-      <div key={port.path} className={styles.item}>
+      <div key={port.path}>
         <div
           onClick={(e) => onClickHandler(e)}
           data-index={i}
@@ -320,9 +298,8 @@ const Hello = () => {
   };
 
   return (
-    <div className={styles.gridContainer}>
-      <Nav></Nav>
-      <div className={styles.mainContainer}>
+    <div>
+      <div>
         <div>{state.data}</div>
         <div>{renderList(devices)}</div>
         <button onClick={() => print()}>Print</button>
@@ -336,8 +313,6 @@ export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/settings" component={Settings} />
-        <Route path="/inventory" component={Inventory} />
         <Route path="/" component={Hello} />
       </Switch>
     </Router>
