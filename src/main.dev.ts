@@ -93,27 +93,12 @@ const createWindow = async () => {
     }
   });
 
-  // mainWindow.webContents.on(
-  //   'select-bluetooth-device',
-  //   (event, deviceList, callback) => {
-  //     event.preventDefault();
-  //     console.log('Console Loging from main', deviceList);
-  //     // callback('');
-  //     // const result = deviceList.find((device) => {
-  //     //   return device.deviceName === 'test';
-  //     // });
-  //     // if (!result) {
-  //     //   callback('');
-  //     // } else {
-  //     //   callback(result.deviceId);
-  //     // }
-  //   }
-  // );
-
+  // We can create custom actions with ipcMain and call it from the renderer
   ipcMain.handle('perform-action', (event, ...args) => {
     console.log(args);
   });
 
+  //<--------------------- BLE list implementation ------------------------------------>
   var callbackForBluetoothEvent = null;
 
   //This sender sends the devicelist from the main process to all renderer processes
@@ -145,17 +130,11 @@ const createWindow = async () => {
 
   //resolves navigator.bluetooth.requestDevice() and stops device discovery
   ipcMain.on('channelForSelectingDevice', (event, DeviceId) => {
-    callbackForBluetoothEvent(sentDeviceId); //reference to callback of win.webContents.on('select-bluetooth-device'...)
+    callbackForBluetoothEvent(DeviceId); //reference to callback of win.webContents.on('select-bluetooth-device'...)
     console.log('Device selected, discovery finished');
   });
 
-  // mainWindow.webContents.on(
-  //   'select-bluetooth-device',
-  //   (event, deviceList, callback) => {
-  //     event.preventDefault();
-  //     console.log(deviceList);
-  //   }
-  // );
+  // <-------------------------------------------------------------------------------------->
 
   mainWindow.on('closed', () => {
     mainWindow = null;

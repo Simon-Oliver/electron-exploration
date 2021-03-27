@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { HashRouter, Switch, Route } from 'react-router-dom';
 import fs from 'fs';
+import Nav from './Components/Nav';
+import Ble from './Components/Ble';
+import Serial from './Components/Serial';
 
 const { ipcRenderer, remote } = require('electron');
 const serialPort = remote.require('serialport');
@@ -227,6 +230,11 @@ const Hello = () => {
     // });
   };
 
+  function handleValueChange(event) {
+    const batteryLevel = event.target.value.getUint8(0);
+    console.log('Battery percentage is ' + batteryLevel);
+  }
+
   const ble = () => {
     ipcRenderer.invoke('perform-action', { test: 'test ble' });
 
@@ -240,21 +248,76 @@ const Hello = () => {
       filters.push({ namePrefix: 'MOB' });
       console.log(`Using filters: ${JSON.stringify(filters)}`);
       navigator.bluetooth
-        .requestDevice({ acceptAllDevices: true })
-        .then((device) => {
-          console.log('> Name:', device);
-          // console.log('> Id:               ' + device.id);
-          // console.log(
-          //   '> UUIDs:            ' + device.uuids.join('\n' + ' '.repeat(20))
-          // );
-          //console.log('> Connected:        ' + device.gatt.connected);
+        .requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b'],
         })
-        .catch((error) => {
-          console.error('Argh! ' + error);
+        .then((device) => device.gatt.connect())
+        .then((server) => {
+          // Note that we could also get all services that match a specific UUID by
+          // passing it to getPrimaryServices().
+          console.log('Getting Services...');
+          return server.getPrimaryServices(
+            '4fafc201-1fb5-459e-8fcc-c5c9c331914b'
+          );
+        })
+        .then((service) => {
+          // Getting custom Characteristic from ESP32
+          console.log(service);
+          return service[0].getCharacteristic(
+            'beb5483e-36e1-4688-b7f5-ea07361b26a8'
+          );
+        })
+        .then((characteristic) => {
+          // Reading ESP32
+          characteristic.addEventListener(
+            'characteristicvaluechanged',
+            handleValueChange
+          );
+          // Reading ESP32
+          return characteristic.startNotifications();
         });
+
+      // .then((services) => {
+      //   function getSupportedProperties(characteristic) {
+      //     let supportedProperties = [];
+      //     for (const p in characteristic.properties) {
+      //       if (characteristic.properties[p] === true) {
+      //         supportedProperties.push(p.toUpperCase());
+      //       }
+      //     }
+      //     return '[' + supportedProperties.join(', ') + ']';
+      //   }
+
+      //   console.log('Getting Characteristics...');
+      //   let queue = Promise.resolve();
+      //   services.forEach((service) => {
+      //     queue = queue.then((_) =>
+      //       service.getCharacteristics().then((characteristics) => {
+      //         console.log('> Service: ' + service.uuid);
+      //         characteristics.forEach((characteristic) => {
+      //           console.log(
+      //             '>> Characteristic: ' +
+      //               characteristic.uuid +
+      //               ' ' +
+      //               getSupportedProperties(characteristic)
+      //           );
+      //         });
+      //       })
+      //     );
+      //   });
+      //   return queue;
+      // })
+      // .catch((error) => {
+      //   console.error('Argh! ' + error);
+      // });
     } catch (e) {
       console.log('EXCEPTION> ' + e);
     }
+  };
+
+  const bleConnect = () => {
+    ipcRenderer.send('channelForSelectingDevice', 'E7:D3:34:E2:11:75');
   };
 
   const renderList = (el) => {
@@ -304,6 +367,7 @@ const Hello = () => {
         <div>{renderList(devices)}</div>
         <button onClick={() => print()}>Print</button>
         <button onClick={() => ble()}>Bluethooth</button>
+        <button onClick={() => bleConnect()}>Connect</button>
       </div>
     </div>
   );
@@ -311,10 +375,18 @@ const Hello = () => {
 
 export default function App() {
   return (
-    <Router>
-      <Switch>
-        <Route path="/" component={Hello} />
-      </Switch>
-    </Router>
+    <HashRouter>
+      <div className="container">
+        <Nav></Nav>
+
+        <div className="main">
+          <Switch>
+            <Route exact path="/" component={Hello} />
+            <Route exact path="/serial" component={Serial} />
+            <Route exact path="/ble" component={Ble} />
+          </Switch>
+        </div>
+      </div>
+    </HashRouter>
   );
 }
