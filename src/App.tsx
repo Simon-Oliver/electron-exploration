@@ -163,7 +163,7 @@ const Hello = () => {
     //     if (err) return console.log(err);
     //     console.log(res); // { filename: '/app/businesscard.pdf' }
     //   });
-    const fileID = uuidv4();
+    const fileID = 'ABC1234'; //uuidv4();
     const filePath = __dirname + `/pdfs/temp/${fileID}.pdf`;
     //win.loadURL('file://' + filePath);
     // win.webContents.on('did-frame-finish-load', () => {
@@ -366,8 +366,6 @@ const Hello = () => {
         <div>{state.data}</div>
         <div>{renderList(devices)}</div>
         <button onClick={() => print()}>Print</button>
-        <button onClick={() => ble()}>Bluethooth</button>
-        <button onClick={() => bleConnect()}>Connect</button>
       </div>
     </div>
   );
@@ -378,7 +376,6 @@ export default function App() {
     <HashRouter>
       <div className="container">
         <Nav></Nav>
-
         <div className="main">
           <Switch>
             <Route exact path="/" component={Hello} />
