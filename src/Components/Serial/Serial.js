@@ -1,5 +1,10 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react';
+import { HashRouter, Switch, Route } from 'react-router-dom';
+import fs from 'fs';
 
+const { ipcRenderer, remote } = require('electron');
+
+const serialPort = remote.require('serialport');
 const Readline = serialPort.parsers.Readline;
 
 export default function Serial() {
@@ -84,32 +89,55 @@ export default function Serial() {
           console.log('err: ' + err);
         }
       });
+    }
 
-    setState({ data: 0 });
-    // let filename = dialog
-    //   .showSaveDialog({})
-    //   .then((result) => {
-    //     filename = result.filePath + '.txt';
-    //     if (filename === undefined) {
-    //       alert("the user clicked the btn but didn't created a file");
-    //       return;
-    //     }
-    //     fs.writeFile(filename, 'test 123', (err) => {
-    //       if (err) {
-    //         alert('an error ocurred with file creation ' + err.message);
-    //         return;
-    //       }
-    //       alert('WE CREATED YOUR FILE SUCCESFULLY');
-    //     });
-    //     alert('we End');
-    //   })
-    //   .catch((err) => {
-    //     alert(err);
-    //   });
-  };
+    const renderList = (el) => {
+      const paths = openPorts.map((e) => e.port.path);
+
+      return el.map((port, i) => (
+        <div key={port.path}>
+          <div
+            onClick={(e) => onClickHandler(e)}
+            data-index={i}
+            data-path={port.path}
+          >
+            {port.manufacturer}
+            <span onClick={(e) => e.stopPropagation()}>
+              {paths.indexOf(port.path) !== -1 ? 'Connected' : 'Not Connected'}
+            </span>
+          </div>
+          {paths.indexOf(port.path) !== -1 ? (
+            <form
+              data-path={port.path}
+              onChange={(e) => changeHandler(e)}
+              onSubmit={(e) => submitHandler(e)}
+            >
+              <label>
+                Your data:
+                <input
+                  onClick={(e) => e.stopPropagation()}
+                  data-path={port.path}
+                  type="text"
+                  name="name"
+                  value={state.data}
+                />
+              </label>
+              <input type="submit" value="Submit" />
+            </form>
+          ) : (
+            ''
+          )}
+        </div>
+      ));
+    };
+
+
   return (
     <div>
-      Serial Component
+      <div>
+        <div>{state.data}</div>
+        <div>{renderList(devices)}</div>
+      </div>
     </div>
   )
 }
