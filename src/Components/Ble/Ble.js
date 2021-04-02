@@ -12,6 +12,7 @@ const dialog = remote.dialog;
 export default function Ble() {
   const [temp,setTemp] = useState(null)
   const [myCharacteristic, setCharacteristic] = useState()
+  const [error, setError] = useState()
 
   const handleValueChange = (event) => {
     const tempValue = event.target.value.getUint8(0);
@@ -110,6 +111,7 @@ const onStopButtonClick = () => {
       //   console.error('Argh! ' + error);
       // });
     } catch (e) {
+      setError({error:e})
       console.log('EXCEPTION> ' + e);
     }
   };
@@ -120,6 +122,9 @@ const onStopButtonClick = () => {
 
   return (
     <div>
+      <div>
+      {error ? error.message:""}
+      </div>
       {temp ? temp : ""}
       <button onClick={() => ble()}>Bluethooth</button>
         <button onClick={() => bleConnect()}>Connect</button>
