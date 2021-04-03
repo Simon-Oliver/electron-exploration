@@ -200,6 +200,10 @@ a:hover {
   background-color: #1e1e1e;
 }
 
+.mainContainer {
+  width: 100%;
+}
+
 .main {
   margin: 10px;
   width: 100%;

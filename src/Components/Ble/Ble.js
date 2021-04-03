@@ -7,7 +7,7 @@ const BrowserWindow = remote.BrowserWindow;
 //const bindings = remote.require('@serialport/bindings');
 
 // Importing dialog module using remote
-const dialog = remote.dialog;
+//const dialog = remote.dialog;
 
 export default function Ble() {
   const [temp,setTemp] = useState(null)
@@ -18,6 +18,7 @@ export default function Ble() {
     const tempValue = event.target.value.getUint8(0);
     setTemp(tempValue)
   }
+
 
 const onStopButtonClick = () => {
     if (myCharacteristic) {
@@ -35,7 +36,6 @@ const onStopButtonClick = () => {
 
   const ble = () => {
     ipcRenderer.invoke('perform-action', { test: 'test ble' });
-
     ipcRenderer.on('channelForBluetoothDeviceList', (event, list) => {
       let newList = list.filter((e) => !e.deviceName.includes('Unknown'));
       console.log(newList);
@@ -75,7 +75,11 @@ const onStopButtonClick = () => {
           );
           // Reading ESP32
           return characteristic.startNotifications();
-        });
+        })
+        .catch((error) => {
+            setError({error:error})
+            console.error('Argh! ' + error);
+         })
 
       // .then((services) => {
       //   function getSupportedProperties(characteristic) {
@@ -111,7 +115,6 @@ const onStopButtonClick = () => {
       //   console.error('Argh! ' + error);
       // });
     } catch (e) {
-      setError({error:e})
       console.log('EXCEPTION> ' + e);
     }
   };

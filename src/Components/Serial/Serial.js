@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { HashRouter, Switch, Route } from 'react-router-dom';
 import fs from 'fs';
+import { ErrorContext } from '../../Utils/ErrorContext';
 
 const { ipcRenderer, remote } = require('electron');
 
@@ -12,6 +13,7 @@ export default function Serial() {
   const [searching, setSearching] = useState(true);
   const [devices, setDevices] = useState([]);
   const [openPorts, setOpenPorts] = useState([]);
+  const {isError,error,color,toggleError} = useContext(ErrorContext)
 
   const intervalId = useRef();
 
@@ -131,12 +133,18 @@ export default function Serial() {
       ));
     };
 
+    const toggleErrorBtn = () =>{
+      toggleError({isError:!isError, error:"Called from Serial Component"})
+      console.log("Toggle Error")
+    }
+
 
   return (
     <div>
       <div>
         <div>{state.data}</div>
         <div>{renderList(devices)}</div>
+        <button onClick={toggleErrorBtn}>Toggle Error</button>
       </div>
     </div>
   )

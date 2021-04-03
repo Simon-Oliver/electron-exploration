@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { HashRouter, Switch, Route } from 'react-router-dom';
 import fs from 'fs';
 import Nav from './Components/Nav';
 import Ble from './Components/Ble';
 import Serial from './Components/Serial';
+import Error from './Components/Error';
+
+import { ErrorContextProvider } from './Utils/ErrorContext';
 
 const { ipcRenderer, remote } = require('electron');
 const serialPort = remote.require('serialport');
@@ -373,17 +376,22 @@ const Hello = () => {
 
 export default function App() {
   return (
-    <HashRouter>
-      <div className="container">
-        <Nav></Nav>
-        <div className="main">
-          <Switch>
-            <Route exact path="/" component={Hello} />
-            <Route exact path="/serial" component={Serial} />
-            <Route exact path="/ble" component={Ble} />
-          </Switch>
+    <ErrorContextProvider>
+      <HashRouter>
+        <div className="container">
+          <Nav></Nav>
+          <div className="mainContainer">
+            <Error></Error>
+            <div className="main">
+              <Switch>
+                <Route exact path="/" component={Hello} />
+                <Route exact path="/serial" component={Serial} />
+                <Route exact path="/ble" component={Ble} />
+              </Switch>
+            </div>
+          </div>
         </div>
-      </div>
-    </HashRouter>
+      </HashRouter>
+    </ErrorContextProvider>
   );
 }
