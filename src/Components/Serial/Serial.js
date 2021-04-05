@@ -13,7 +13,7 @@ export default function Serial() {
   const [searching, setSearching] = useState(true);
   const [devices, setDevices] = useState([]);
   const [openPorts, setOpenPorts] = useState([]);
-  const {isError,error,color,toggleError} = useContext(ErrorContext)
+  const {toggleError, setError, setErrColor} = useContext(ErrorContext)
 
   const intervalId = useRef();
 
@@ -134,7 +134,8 @@ export default function Serial() {
     };
 
     const toggleErrorBtn = () =>{
-      toggleError({isError:!isError, error:"Called from Serial Component"})
+      setError({message:"This is a test error!", color:"orange"})
+      toggleError()
       console.log("Toggle Error")
     }
 

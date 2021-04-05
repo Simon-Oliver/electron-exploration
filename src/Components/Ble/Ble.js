@@ -13,6 +13,7 @@ export default function Ble() {
   const [temp,setTemp] = useState(null)
   const [myCharacteristic, setCharacteristic] = useState()
   const [error, setError] = useState()
+  const [bleDevice, setDevice] = useState()
 
   const handleValueChange = (event) => {
     const tempValue = event.target.value.getUint8(0);
@@ -27,6 +28,15 @@ const onStopButtonClick = () => {
         console.log('> Notifications stopped');
         myCharacteristic.removeEventListener('characteristicvaluechanged',
         handleValueChange);
+        if (!bleDevice) {
+          return;
+        }
+        console.log('Disconnecting from Bluetooth Device...');
+        if (bleDevice.gatt.connected) {
+          bleDevice.gatt.disconnect();
+        } else {
+          console.log('> Bluetooth Device is already disconnected');
+        }
       })
       .catch(error => {
         console.log('Argh! ' + error);
@@ -34,11 +44,12 @@ const onStopButtonClick = () => {
     }
   }
 
+
   const ble = () => {
     ipcRenderer.invoke('perform-action', { test: 'test ble' });
     ipcRenderer.on('channelForBluetoothDeviceList', (event, list) => {
       let newList = list.filter((e) => !e.deviceName.includes('Unknown'));
-      console.log(newList);
+      console.log("Device List...",newList);
     });
 
     try {
@@ -50,7 +61,9 @@ const onStopButtonClick = () => {
           acceptAllDevices: true,
           optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b'],
         })
-        .then((device) => device.gatt.connect())
+        .then((device) => {
+          setDevice(device)
+         return bleDevice.gatt.connect()})
         .then((server) => {
           // Note that we could also get all services that match a specific UUID by
           // passing it to getPrimaryServices().
