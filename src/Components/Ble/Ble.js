@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import Modal from '../Modal'
 
 const { ipcRenderer, remote } = require('electron');
 const serialPort = remote.require('serialport');
@@ -14,12 +15,21 @@ export default function Ble() {
   const [myCharacteristic, setCharacteristic] = useState()
   const [error, setError] = useState()
   const [bleDevice, setDevice] = useState()
+  const [modal, setModal] = useState(true)
 
   const handleValueChange = (event) => {
     const tempValue = event.target.value.getUint8(0);
     setTemp(tempValue)
   }
 
+
+  const testData = [
+    {name: "Device 1"},
+    {name: "Device 2"},
+    {name: "Device 3"},
+    {name: "Device 4"},
+    {name: "Device 5"},
+  ]
 
 const onStopButtonClick = () => {
     if (myCharacteristic) {
@@ -42,6 +52,14 @@ const onStopButtonClick = () => {
         console.log('Argh! ' + error);
       });
     }
+  }
+
+  const renderDeviceList = () =>{
+    return testData.map(e =>{
+      return(
+        <div>{e.name}</div>
+      )
+    })
   }
 
 
@@ -136,8 +154,15 @@ const onStopButtonClick = () => {
     ipcRenderer.send('channelForSelectingDevice', 'E7:D3:34:E2:11:75');
   };
 
+  const toggleModal = () => {
+    setModal(!modal)
+  }
+
   return (
     <div>
+     {modal &&  <Modal closeModal={toggleModal}>
+        <div>Test</div>
+      </Modal>}
       <div>
       {error ? error.message:""}
       </div>
